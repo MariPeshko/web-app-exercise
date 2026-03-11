@@ -41,8 +41,8 @@ export default function SignupPage() {
     try {
       await signup(name, email, password);
       router.push("/dashboard");
-    } catch {
-      setError("Something went wrong. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     }
   };
 

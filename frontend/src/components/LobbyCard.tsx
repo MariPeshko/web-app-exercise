@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Users, Clock, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
@@ -36,7 +37,14 @@ export default function LobbyCard({ lobby, onJoin }: LobbyCardProps) {
             <div>
               <h3 className="font-heading text-lg font-bold uppercase tracking-wide">{lobby.name}</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Hosted by <span className="font-bold text-foreground">{lobby.host.name}</span>
+                Hosted by{" "}
+                <Link
+                  href={`/profile/${lobby.host.id}`}
+                  className="font-bold text-foreground underline decoration-dotted underline-offset-2 hover:text-primary transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {lobby.host.name}
+                </Link>
               </p>
             </div>
             <Badge className={status.className}>
@@ -59,6 +67,21 @@ export default function LobbyCard({ lobby, onJoin }: LobbyCardProps) {
               <Clock className="h-3.5 w-3.5" />
               {new Date(lobby.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
             </span>
+          </div>
+
+          {/* Player avatars */}
+          <div className="mt-3 flex items-center gap-1">
+            {lobby.players.map((player) => (
+              <Link
+                key={player.id}
+                href={`/profile/${player.id}`}
+                onClick={(e) => e.stopPropagation()}
+                title={player.name}
+                className="flex h-7 w-7 items-center justify-center border-2 border-foreground bg-primary font-heading text-[10px] font-black text-primary-foreground shadow-[1px_1px_0px_0px_#000000] hover:scale-110 hover:z-10 transition-transform"
+              >
+                {player.name.charAt(0).toUpperCase()}
+              </Link>
+            ))}
           </div>
 
           {lobby.documentName && (

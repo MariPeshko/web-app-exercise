@@ -1,5 +1,3 @@
-# Connection settings
-
 import os
 from sqlmodel import create_engine
 from sqlmodel import SQLModel
@@ -18,13 +16,19 @@ DATABASE_URL = os.getenv(
 # TODO: delete echo=True for production
 engine = create_engine(DATABASE_URL, echo=True)
 
+# Create a session factory
+# SessionLocal — this is a class for creating new sessions (connections)
+SessionLocal = sessionmaker(bind=engine)
+
+# -----------------------------------------------------------------------------
+# Functions
+# -----------------------------------------------------------------------------
+
+
 # Create tables in the database
 def create_db_and_tables():
 	SQLModel.metadata.create_all(bind=engine)
 
-# Create a session factory
-# SessionLocal — this is a class for creating new sessions (connections)
-SessionLocal = sessionmaker(bind=engine)
 
 # Function to get database session
 # It creates a short-lived database session for a single API request and

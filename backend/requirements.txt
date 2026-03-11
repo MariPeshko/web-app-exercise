@@ -18,4 +18,5 @@ PyJWT==2.8.0
 argon2-cffi==25.1.0		# secure password hashing library
 dnspython==2.8.0 		# email-validator 1
 email-validator==2.3.0	# email-validator 2
-python-multipart==0.0.22 # for Form data in OAuth2PasswordRequestForm
+python-multipart==0.0.22	# for Form data in OAuth2PasswordRequestForm
+httpx==0.28.1			# to call ai_core

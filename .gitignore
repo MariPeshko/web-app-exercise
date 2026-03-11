@@ -20,6 +20,7 @@
 
 # passwords, API keys
 .env
+.env.*
 .env.local
 **/.env
 **/.env.local
@@ -29,6 +30,22 @@
 .pytest_cache/
 .coverage
 htmlcov/
+coverage.xml
+
+# Python tooling caches
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.ipynb_checkpoints/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# OS generated files
+.DS_Store
+Thumbs.db
 
 notes-mpeshko.txt
 notes-mpeshko.cpp

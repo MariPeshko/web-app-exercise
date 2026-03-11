@@ -1,5 +1,3 @@
-# to run: uvicorn main:app --reload
-
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware # to "allow" the frontend access
@@ -8,6 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware # to "allow" the frontend acc
 from database import create_db_and_tables
 from routes.auth import router as auth_router
 from routes.user import router as user_router
+from routes.lobby import router as lobby_router
+from routes.game import router as game_router
+
 
 # Lifespan event handler. Ensures the tables are created every time the application starts.
 @asynccontextmanager
@@ -18,6 +19,7 @@ async def lifespan(app: FastAPI):
 	yield
 	# Code here runs on shutdown
 	print("Shutdown: Application closing.")
+
 
 app = FastAPI(lifespan=lifespan)
 
@@ -40,6 +42,9 @@ app.add_middleware(
 
 app.include_router(auth_router, prefix="/api")
 app.include_router(user_router, prefix="/api")
+app.include_router(lobby_router, prefix="/api")
+app.include_router(game_router, prefix="/api")
+
 
 @app.get("/")
 def read_root():

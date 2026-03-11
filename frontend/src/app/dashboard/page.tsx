@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { apiGetLobbies, apiCreateLobby, apiJoinLobby, apiUploadDocument } from "@/lib/api";
 import { Plus, Search, Users, Trophy, BookOpen, TrendingUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,65 +19,6 @@ import {
   fadeInUp,
 } from "@/lib/animations";
 
-// Mock lobbies for development — replace with API calls when backend is ready
-const MOCK_LOBBIES: Lobby[] = [
-  {
-    id: "1",
-    name: "Biology Final Prep",
-    host: { id: "2", name: "Sarah", email: "sarah@test.com" },
-    players: [
-      { id: "2", name: "Sarah", email: "sarah@test.com" },
-      { id: "3", name: "Alex", email: "alex@test.com" },
-    ],
-    maxPlayers: 4,
-    subject: "Biology",
-    status: "waiting",
-    documentName: "Chapter 12 - Cell Division.pdf",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "2",
-    name: "Calculus Study Group",
-    host: { id: "4", name: "Jordan", email: "jordan@test.com" },
-    players: [
-      { id: "4", name: "Jordan", email: "jordan@test.com" },
-      { id: "5", name: "Taylor", email: "taylor@test.com" },
-      { id: "6", name: "Morgan", email: "morgan@test.com" },
-    ],
-    maxPlayers: 5,
-    subject: "Mathematics",
-    status: "in-progress",
-    documentName: "Derivatives & Integrals.pdf",
-    createdAt: new Date(Date.now() - 1800000).toISOString(),
-  },
-  {
-    id: "3",
-    name: "History Quiz Night",
-    host: { id: "7", name: "Casey", email: "casey@test.com" },
-    players: [{ id: "7", name: "Casey", email: "casey@test.com" }],
-    maxPlayers: 6,
-    subject: "History",
-    status: "waiting",
-    createdAt: new Date(Date.now() - 600000).toISOString(),
-  },
-  {
-    id: "4",
-    name: "CS Algorithms Review",
-    host: { id: "8", name: "Riley", email: "riley@test.com" },
-    players: [
-      { id: "8", name: "Riley", email: "riley@test.com" },
-      { id: "9", name: "Jamie", email: "jamie@test.com" },
-      { id: "10", name: "Drew", email: "drew@test.com" },
-      { id: "11", name: "Pat", email: "pat@test.com" },
-    ],
-    maxPlayers: 4,
-    subject: "Computer Science",
-    status: "finished",
-    documentName: "Sorting Algorithms Notes.pdf",
-    createdAt: new Date(Date.now() - 7200000).toISOString(),
-  },
-];
-
 const statCards = [
   { key: "total", icon: BookOpen, label: "Total Lobbies", bg: "bg-primary", fg: "text-primary-foreground", shadow: "shadow-[3px_3px_0px_0px_#FF6B35]" },
   { key: "open", icon: Users, label: "Open Lobbies", bg: "bg-secondary", fg: "text-secondary-foreground", shadow: "shadow-[3px_3px_0px_0px_#00E5A0]" },
@@ -85,12 +28,34 @@ const statCards = [
 
 const filters = ["all", "waiting", "in-progress", "finished"] as const;
 
+// Helper: read the JWT from localStorage
+function getToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("access_token");
+}
+
 export default function DashboardPage() {
   const { user } = useAuth();
-  const [lobbies, setLobbies] = useState<Lobby[]>(MOCK_LOBBIES);
+  const router = useRouter();
+  const [lobbies, setLobbies] = useState<Lobby[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [filter, setFilter] = useState<"all" | "waiting" | "in-progress" | "finished">("all");
+
+  // Fetch lobbies from the backend
+  const fetchLobbies = useCallback(async () => {
+    try {
+      const data = await apiGetLobbies();
+      setLobbies(data);
+    } catch (err) {
+      console.error("Failed to fetch lobbies:", err);
+    }
+  }, []);
+
+  // Load lobbies on mount
+  useEffect(() => {
+    fetchLobbies();
+  }, [fetchLobbies]);
 
   const filteredLobbies = lobbies.filter((lobby) => {
     const matchesSearch =
@@ -100,31 +65,39 @@ export default function DashboardPage() {
     return matchesSearch && matchesFilter;
   });
 
-  const handleCreateLobby = (data: { name: string; subject: string; maxPlayers: number; document: File | null }) => {
-    if (!user) return;
-    const newLobby: Lobby = {
-      id: String(Date.now()),
-      name: data.name,
-      host: user,
-      players: [user],
-      maxPlayers: data.maxPlayers,
-      subject: data.subject,
-      status: "waiting",
-      documentName: data.document?.name,
-      createdAt: new Date().toISOString(),
-    };
-    setLobbies([newLobby, ...lobbies]);
+  const handleCreateLobby = async (data: { name: string; subject: string; maxPlayers: number; document: File | null }) => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const newLobby = await apiCreateLobby(token, {
+        name: data.name,
+        subject: data.subject,
+        max_players: data.maxPlayers,
+      });
+      // Upload document to AI core if provided
+      if (data.document) {
+        try {
+          await apiUploadDocument(token, newLobby.id, data.document);
+        } catch (uploadErr) {
+          console.error("Document upload failed:", uploadErr);
+          // Still navigate — user can re-upload in the waiting room
+        }
+      }
+      router.push(`/lobby/${newLobby.id}`);
+    } catch (err) {
+      console.error("Failed to create lobby:", err);
+    }
   };
 
-  const handleJoinLobby = (lobbyId: string) => {
-    if (!user) return;
-    setLobbies(
-      lobbies.map((lobby) =>
-        lobby.id === lobbyId
-          ? { ...lobby, players: [...lobby.players, user] }
-          : lobby
-      )
-    );
+  const handleJoinLobby = async (lobbyId: string) => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      await apiJoinLobby(token, lobbyId);
+      router.push(`/lobby/${lobbyId}`);
+    } catch (err) {
+      console.error("Failed to join lobby:", err);
+    }
   };
 
   // Stats

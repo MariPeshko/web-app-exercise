@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { Brain, LogOut, Menu } from "lucide-react";
+import { Brain, LogOut, Menu, User } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { springBouncy, springSnappy } from "@/lib/animations";
@@ -87,6 +87,12 @@ export default function Navbar() {
                   <DropdownMenuItem disabled className="text-muted-foreground text-xs font-mono">
                     {user?.email}
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="font-bold uppercase cursor-pointer">
+                    <Link href="/profile/me">
+                      <User className="mr-2 h-4 w-4" />
+                      My Profile
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={logout} className="font-bold uppercase text-pink focus:text-pink cursor-pointer">
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
@@ -142,6 +148,11 @@ export default function Navbar() {
                     >
                       <Button asChild>
                         <Link href="/dashboard" onClick={() => setMobileOpen(false)}>Dashboard</Link>
+                      </Button>
+                      <Button variant="outline" asChild>
+                        <Link href="/profile/me" onClick={() => setMobileOpen(false)}>
+                          <User className="mr-2 h-4 w-4" /> My Profile
+                        </Link>
                       </Button>
                       <Button
                         variant="destructive"

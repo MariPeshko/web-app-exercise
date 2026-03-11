@@ -5,6 +5,10 @@ import argon2
 import jwt
 from fastapi.security import OAuth2PasswordBearer
 
+# -----------------------------------------------------------------------------
+# Constants and Global Instances
+# -----------------------------------------------------------------------------
+
 # JWT signing key, algorithm, and token lifetime (for access tokens).
 SECRET_KEY = os.getenv("SECRET_KEY", "super_secret_key_for_testing")
 ALGORITHM = "HS256"
@@ -12,11 +16,20 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 ph = PasswordHasher() 
 
+# OAuth2 scheme dependency. 
+# It tells FastAPI which URL to use to get the token.
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+
+# -----------------------------------------------------------------------------
+# Functions
+# -----------------------------------------------------------------------------
+
+
 def get_password_hash(password: str) -> str:
     """Hashes a password for secure database storage."""
     return ph.hash(password)
-    
-   
+
+
 def verify_password(inserted_password: str, hashed_password: str) -> bool:
     """Checks if a provided password matches the hashed database passowrd"""
     try:
@@ -27,7 +40,6 @@ def verify_password(inserted_password: str, hashed_password: str) -> bool:
     except argon2.exceptions.InvalidHashError:
         return False
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 def create_access_token(data: dict) -> str:
     """Generates a JSON Web Token for user sessions."""
@@ -41,4 +53,3 @@ def create_access_token(data: dict) -> str:
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     
     return encoded_jwt
-

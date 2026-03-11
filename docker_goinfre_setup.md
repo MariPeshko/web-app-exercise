@@ -46,12 +46,9 @@ df -h /goinfre/$(whoami)/.docker_data
 You are now ready to run `docker compose up --build` with all the space you need!
 
 
-
-
-
 ---
 
-# Some useful commands
+Some useful commands
 
 ```bash
 docker system prune -a --volumes
@@ -67,7 +64,7 @@ df -h
 ```bash
 du -sh ~/git_trans --exclude=node_modules --exclude=.next
 ```
-Should be < 200MB
+# Should be < 200MB
 
 # Check Docker size (should be in goinfre)
 ```bash

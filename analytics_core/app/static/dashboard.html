@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudAI Analytics Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --ok: #34d399;
+    }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+    h1 {
+      margin: 0 0 14px;
+      font-size: 1.5rem;
+    }
+    .toolbar, .kpis, .charts, .realtime {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .toolbar {
+      grid-template-columns: repeat(6, minmax(120px, 1fr));
+      align-items: end;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .kpis {
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+    }
+    .kpi-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .kpi-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .charts {
+      grid-template-columns: repeat(2, minmax(280px, 1fr));
+    }
+    .chart-panel {
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-wrap {
+      position: relative;
+      height: 260px;
+      min-height: 260px;
+      max-height: 260px;
+      margin-top: 8px;
+    }
+    canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-bottom: 4px;
+    }
+    input, select, button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #475569;
+      background: #0b1220;
+      color: var(--text);
+    }
+    button {
+      background: #1d4ed8;
+      border-color: #1e40af;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: #334155;
+      border-color: #475569;
+    }
+    .status {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .status.ok {
+      color: var(--ok);
+    }
+    .realtime-line {
+      font-size: 0.9rem;
+      border-top: 1px solid #334155;
+      padding-top: 8px;
+      margin-top: 8px;
+      overflow-wrap: anywhere;
+    }
+  </style>
+</head>
+<body>
+  <h1>StudAI Analytics Dashboard</h1>
+
+  <div class="toolbar">
+    <div class="panel">
+      <label for="from">From</label>
+      <input id="from" type="datetime-local" />
+    </div>
+    <div class="panel">
+      <label for="to">To</label>
+      <input id="to" type="datetime-local" />
+    </div>
+    <div class="panel">
+      <label for="mode">Mode</label>
+      <select id="mode">
+        <option value="">all</option>
+        <option value="solo">solo</option>
+        <option value="group">group</option>
+      </select>
+    </div>
+    <div class="panel">
+      <label for="refresh">&nbsp;</label>
+      <button id="refresh">Refresh</button>
+    </div>
+    <div class="panel">
+      <label for="csv">&nbsp;</label>
+      <button id="csv" class="secondary">Export CSV</button>
+    </div>
+    <div class="panel">
+      <label for="pdf">&nbsp;</label>
+      <button id="pdf" class="secondary">Export PDF</button>
+    </div>
+  </div>
+
+  <div class="kpis">
+    <div class="panel"><div class="kpi-label">Games Played</div><div id="kpi-games" class="kpi-value">-</div></div>
+    <div class="panel"><div class="kpi-label">Average Score</div><div id="kpi-avg-score" class="kpi-value">-</div></div>
+    <div class="panel"><div class="kpi-label">Best Score</div><div id="kpi-best-score" class="kpi-value">-</div></div>
+    <div class="panel"><div class="kpi-label">Avg Answer Time (ms)</div><div id="kpi-avg-time" class="kpi-value">-</div></div>
+    <div class="panel"><div class="kpi-label">Active Users</div><div id="kpi-users" class="kpi-value">-</div></div>
+  </div>
+
+  <div class="charts">
+    <div class="panel chart-panel">
+      <div class="kpi-label">Games Played (Daily)</div>
+      <div class="chart-wrap">
+        <canvas id="chart-games"></canvas>
+      </div>
+    </div>
+    <div class="panel chart-panel">
+      <div class="kpi-label">Average Score (Daily)</div>
+      <div class="chart-wrap">
+        <canvas id="chart-score"></canvas>
+      </div>
+    </div>
+    <div class="panel chart-panel">
+      <div class="kpi-label">Avg Answer Time (Daily)</div>
+      <div class="chart-wrap">
+        <canvas id="chart-time"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel realtime">
+    <div class="kpi-label">Realtime Stream</div>
+    <div id="realtime-status" class="status">Disconnected</div>
+    <div id="realtime-last" class="realtime-line">No events yet.</div>
+  </div>
+
+  <script>
+    const API_PREFIX = "/analytics";
+    let gamesChart;
+    let scoreChart;
+    let timeChart;
+
+    function toIsoLocal(date) {
+      const pad = (n) => String(n).padStart(2, "0");
+      const yyyy = date.getFullYear();
+      const mm = pad(date.getMonth() + 1);
+      const dd = pad(date.getDate());
+      const hh = pad(date.getHours());
+      const min = pad(date.getMinutes());
+      return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+    }
+
+    function toUtcIso(value) {
+      return new Date(value).toISOString();
+    }
+
+    function makeUrl(path, params) {
+      const url = new URL(path, window.location.origin);
+      Object.entries(params).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== "") {
+          url.searchParams.set(k, v);
+        }
+      });
+      return url.toString();
+    }
+
+    async function fetchJson(url) {
+      const res = await fetch(url);
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`HTTP ${res.status}: ${text}`);
+      }
+      return res.json();
+    }
+
+    function renderKpis(data) {
+      document.getElementById("kpi-games").textContent = data.games_played;
+      document.getElementById("kpi-avg-score").textContent = data.avg_score.toFixed(2);
+      document.getElementById("kpi-best-score").textContent = data.best_score;
+      document.getElementById("kpi-avg-time").textContent = data.avg_answer_time_ms.toFixed(2);
+      document.getElementById("kpi-users").textContent = data.active_users;
+    }
+
+    function renderChart(canvasId, currentChart, label, points, color) {
+      const labels = points.map((p) => new Date(p.timestamp).toLocaleDateString());
+      const values = points.map((p) => p.value);
+      if (currentChart) currentChart.destroy();
+      const ctx = document.getElementById(canvasId).getContext("2d");
+      return new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [{ label, data: values, borderColor: color, backgroundColor: color + "33", fill: true }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: "#cbd5e1" } },
+            y: { ticks: { color: "#cbd5e1" } }
+          },
+          plugins: {
+            legend: { labels: { color: "#cbd5e1" } }
+          }
+        }
+      });
+    }
+
+    async function refreshDashboard() {
+      const from = toUtcIso(document.getElementById("from").value);
+      const to = toUtcIso(document.getElementById("to").value);
+      const mode = document.getElementById("mode").value;
+
+      const [kpis, gamesTs, scoreTs, timeTs] = await Promise.all([
+        fetchJson(makeUrl(`${API_PREFIX}/kpis`, { from, to, mode })),
+        fetchJson(makeUrl(`${API_PREFIX}/timeseries`, { metric: "games_played", interval: "day", from, to, mode })),
+        fetchJson(makeUrl(`${API_PREFIX}/timeseries`, { metric: "avg_score", interval: "day", from, to, mode })),
+        fetchJson(makeUrl(`${API_PREFIX}/timeseries`, { metric: "avg_answer_time_ms", interval: "day", from, to, mode }))
+      ]);
+
+      renderKpis(kpis);
+      gamesChart = renderChart("chart-games", gamesChart, "Games Played", gamesTs.points, "#38bdf8");
+      scoreChart = renderChart("chart-score", scoreChart, "Average Score", scoreTs.points, "#a78bfa");
+      timeChart = renderChart("chart-time", timeChart, "Avg Answer Time (ms)", timeTs.points, "#f59e0b");
+    }
+
+    function exportFile(kind) {
+      const from = toUtcIso(document.getElementById("from").value);
+      const to = toUtcIso(document.getElementById("to").value);
+      const mode = document.getElementById("mode").value;
+      const url = makeUrl(`${API_PREFIX}/export.${kind}`, { from, to, mode });
+      window.open(url, "_blank");
+    }
+
+    function connectRealtime() {
+      const status = document.getElementById("realtime-status");
+      const output = document.getElementById("realtime-last");
+      const source = new EventSource(`${API_PREFIX}/realtime/stream`);
+      status.textContent = "Connected";
+      status.classList.add("ok");
+
+      source.addEventListener("update", (ev) => {
+        output.textContent = ev.data;
+      });
+
+      source.addEventListener("heartbeat", () => {
+        status.textContent = "Connected (heartbeat)";
+      });
+
+      source.onerror = () => {
+        status.textContent = "Disconnected - retrying...";
+        status.classList.remove("ok");
+      };
+    }
+
+    function initDefaultRange() {
+      const now = new Date();
+      const past = new Date(now.getTime() - 1000 * 60 * 60 * 24 * 14);
+      document.getElementById("to").value = toIsoLocal(now);
+      document.getElementById("from").value = toIsoLocal(past);
+    }
+
+    document.getElementById("refresh").addEventListener("click", () => {
+      refreshDashboard().catch((err) => alert(err.message));
+    });
+    document.getElementById("csv").addEventListener("click", () => exportFile("csv"));
+    document.getElementById("pdf").addEventListener("click", () => exportFile("pdf"));
+
+    initDefaultRange();
+    refreshDashboard().catch((err) => alert(err.message));
+    connectRealtime();
+  </script>
+</body>
+</html>
