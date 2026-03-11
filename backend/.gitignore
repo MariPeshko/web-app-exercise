@@ -1,0 +1,22 @@
+# Python virtual environment
+.venv/
+venv/
+ENV/
+env/
+
+# Python cash
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distributives and cash
+dist/
+build/
+*.egg-info/
+
+# Environmental: passwords, API keys
+.env
+.env.local
+
+# Temporary files VS Code
+.vscode/

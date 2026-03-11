@@ -1,0 +1,300 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ═══════════════════════════════════════════════════════════════
+   StudAI — NEO-BRUTALIST DESIGN SYSTEM
+   Bold borders · Hard shadows · Binary radii · Bouncy motion
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --radius: 4px;
+
+  /* ─── Core Palette: Dark Neo-Brut ─── */
+  --background: #0D0D0D;
+  --foreground: #FFFDF7;
+
+  /* Primary — Bold Orange */
+  --primary: #FF6B35;
+  --primary-foreground: #0D0D0D;
+
+  /* Secondary — Electric Mint */
+  --secondary: #00E5A0;
+  --secondary-foreground: #0D0D0D;
+
+  /* Accent — Bright Yellow */
+  --accent: #FFE156;
+  --accent-foreground: #0D0D0D;
+
+  /* Muted */
+  --muted: #1A1A2E;
+  --muted-foreground: #8B8B9E;
+
+  /* Card / Surface */
+  --card: #16213E;
+  --card-foreground: #FFFDF7;
+  --popover: #16213E;
+  --popover-foreground: #FFFDF7;
+
+  /* Borders — intentionally high contrast */
+  --border: #2E2E4A;
+  --input: #2E2E4A;
+  --ring: #FF6B35;
+
+  /* Destructive — Hot Pink */
+  --destructive: #FF3366;
+
+  /* Extra brand colors */
+  --pink: #FF3366;
+  --blue: #4ECDC4;
+  --surface: #16213E;
+  --surface-hover: #1A1A2E;
+
+  /* Hard shadow offsets */
+  --shadow-sm: 3px 3px 0px 0px #000000;
+  --shadow-md: 4px 4px 0px 0px #000000;
+  --shadow-lg: 6px 6px 0px 0px #000000;
+  --shadow-xl: 8px 8px 0px 0px #000000;
+  --shadow-primary: 4px 4px 0px 0px #FF6B35;
+  --shadow-secondary: 4px 4px 0px 0px #00E5A0;
+  --shadow-accent: 4px 4px 0px 0px #FFE156;
+  --shadow-pink: 4px 4px 0px 0px #FF3366;
+
+  /* Charts */
+  --chart-1: #FF6B35;
+  --chart-2: #00E5A0;
+  --chart-3: #FFE156;
+  --chart-4: #FF3366;
+  --chart-5: #4ECDC4;
+
+  /* Sidebar */
+  --sidebar: #0D0D0D;
+  --sidebar-foreground: #FFFDF7;
+  --sidebar-primary: #FF6B35;
+  --sidebar-primary-foreground: #0D0D0D;
+  --sidebar-accent: #1A1A2E;
+  --sidebar-accent-foreground: #FFFDF7;
+  --sidebar-border: #2E2E4A;
+  --sidebar-ring: #FF6B35;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-pink: var(--pink);
+  --color-blue: var(--blue);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-space-grotesk);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --radius-pill: 9999px;
+}
+
+/* ─── Base ─── */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans), system-ui, sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading), var(--font-sans), system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NEO-BRUTALIST UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Hard Shadow Classes ─── */
+.shadow-brutal {
+  box-shadow: var(--shadow-md);
+  border: 2px solid var(--foreground);
+}
+.shadow-brutal-sm {
+  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--foreground);
+}
+.shadow-brutal-lg {
+  box-shadow: var(--shadow-lg);
+  border: 2px solid var(--foreground);
+}
+.shadow-brutal-xl {
+  box-shadow: var(--shadow-xl);
+  border: 2px solid var(--foreground);
+}
+.shadow-brutal-primary {
+  box-shadow: var(--shadow-primary);
+  border: 2px solid var(--primary);
+}
+.shadow-brutal-secondary {
+  box-shadow: var(--shadow-secondary);
+  border: 2px solid var(--secondary);
+}
+.shadow-brutal-accent {
+  box-shadow: var(--shadow-accent);
+  border: 2px solid var(--accent);
+}
+.shadow-brutal-pink {
+  box-shadow: var(--shadow-pink);
+  border: 2px solid var(--pink);
+}
+
+/* ─── Hover: shadow grows, element lifts ─── */
+.brutal-hover {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.brutal-hover:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px currentColor;
+}
+.brutal-hover:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px 0px currentColor;
+}
+
+/* ─── Sticker / Tag aesthetic ─── */
+.sticker {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 2px solid currentColor;
+  font-family: var(--font-mono), monospace;
+}
+.sticker-pill {
+  border-radius: 9999px;
+}
+.sticker-sharp {
+  border-radius: 0;
+}
+
+/* ─── Gradient text (brutalist version - sharper stops) ─── */
+.gradient-text {
+  background: linear-gradient(135deg, #FF6B35 0%, #FFE156 50%, #00E5A0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.gradient-text-alt {
+  background: linear-gradient(135deg, #FF3366 0%, #FF6B35 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Marquee / Ticker tape ─── */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee {
+  animation: marquee 20s linear infinite;
+}
+
+/* ─── Chunky underline for links ─── */
+.link-brutal {
+  text-decoration: none;
+  border-bottom: 3px solid var(--primary);
+  padding-bottom: 1px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.link-brutal:hover {
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+
+/* ─── Dotted grid background ─── */
+.bg-dots {
+  background-image: radial-gradient(circle, #2E2E4A 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ─── Cross-hatch background ─── */
+.bg-crosshatch {
+  background-image:
+    linear-gradient(45deg, #2E2E4A 25%, transparent 25%),
+    linear-gradient(-45deg, #2E2E4A 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #2E2E4A 75%),
+    linear-gradient(-45deg, transparent 75%, #2E2E4A 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  opacity: 0.3;
+}
+
+/* ─── Chunky border utilities ─── */
+.border-2-solid { border: 2px solid; }
+.border-3-solid { border: 3px solid; }
+.border-4-solid { border: 4px solid; }
+
+/* ─── Smooth scrolling ─── */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ─── Custom scrollbar (brutalist) ─── */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+  border-left: 2px solid var(--border);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border: 2px solid var(--background);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary);
+}
+
+/* ─── Selection colors ─── */
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}

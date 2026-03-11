@@ -1,0 +1,34 @@
+# VS Code Settings
+.vscode/
+**/.vscode/
+# Note: If we agreed on shared team settings, we can comment out .vscode/
+
+# Python virtual environment (search in any folder)
+**/.venv/
+**/venv/
+**/ENV/
+
+# Python cash
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+
+# Distributives and cash
+**/dist/
+**/build/
+**/*.egg-info/
+
+# passwords, API keys
+.env
+.env.local
+**/.env
+**/.env.local
+
+# Temporary files and logs
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
+
+notes-mpeshko.txt
+notes-mpeshko.cpp
