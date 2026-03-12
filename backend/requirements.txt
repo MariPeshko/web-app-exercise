@@ -12,10 +12,8 @@ starlette==0.52.1
 typing-inspection==0.4.2
 typing_extensions==4.15.0
 uvicorn==0.40.0
-sqlmodel==0.0.16
+sqlalchemy==2.0.43
 psycopg2-binary==2.9.11	# driver for Python to communicate with PostgreSQL
-PyJWT==2.8.0
-argon2-cffi==25.1.0		# secure password hashing library
+asyncpg==0.31.0			# driver for Python to communicate with PostgreSQL asynchronously
 dnspython==2.8.0 		# email-validator 1
 email-validator==2.3.0	# email-validator 2
-python-multipart==0.0.22 # for Form data in OAuth2PasswordRequestForm

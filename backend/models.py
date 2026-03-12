@@ -1,26 +1,13 @@
-from typing import Optional
-from pydantic import EmailStr
-from sqlmodel import Field, SQLModel
+# Table Description (SQLAlchemy)
+# Here we tell SQLAlchemy what the table looks like in Postgres.
 
-# to do: email: str or email: EmailStr
-class User(SQLModel, table=True):
+from database import Base
+from sqlalchemy import Column, Integer, String
+
+class User(Base):
     __tablename__ = "users"
-    
-    id: Optional[int] = Field(default=None, primary_key=True)
-    email: str = Field(unique=True, index=True, nullable=False)
-    nickname: str = Field(unique=True, index=True, nullable=False)
-    hashed_password: str = Field(nullable=False)
 
-class UserCreate(SQLModel):
-    email: EmailStr
-    nickname: str
-    password: str
-
-class UserResponse(SQLModel):
-    id: int
-    email: EmailStr
-    nickname: str
-
-class Token(SQLModel):
-    access_token: str
-    token_type: str = "bearer"
+    id = Column(Integer, primary_key=True, index=True)
+    nickname = Column(String, unique=True, index=True)
+    email = Column(String, unique=True, index=True)
+    hashed_password = Column(String)

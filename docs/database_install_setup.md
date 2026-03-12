@@ -1,6 +1,4 @@
-## To run database locally
-
-### 1. Install PostgreSQL on WSL (Ubuntu)
+## 1. Install PostgreSQL on WSL (Ubuntu)
 
 Update your package list:
 ```bash
@@ -18,7 +16,7 @@ WSL doesn't always start services automatically like a full Linux OS does. You h
 sudo service postgresql start
 ```
 
-### 2. Accessing the Postgres "Superuser"
+## 2. Accessing the Postgres "Superuser"
 
 By default, Postgres creates a Linux user named postgres. To enter the database console for the first time, you "become" that user:
 ```bash
@@ -85,14 +83,14 @@ For local: `postgresql://quiz_admin:secure_pass@localhost:5432/quiz_game_db`
 3. Install the necessary drivers
 
 In order for Python to communicate with PostgreSQL, you need a driver.
-The most popular one is `psycopg2`.
+The most popular one is `psycopg2`, or, if you are using `SQLModel/SQLAlchemy` asynchronously `asyncpg`.
 Install it in your virtual environment:
 ```bash
 pip install psycopg2-binary
+pip install asyncpg
 ```
 
 4. Make sure SQLModel/SQLAlchemy creates tables. This block must be in the backend code.
-
 5. Now you can launch the backend.
 
 ## Why might Swagger (`/docs`) throw an error?

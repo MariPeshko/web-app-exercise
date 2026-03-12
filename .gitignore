@@ -24,11 +24,5 @@
 **/.env
 **/.env.local
 
-# Temporary files and logs
-*.log
-.pytest_cache/
-.coverage
-htmlcov/
-
+# notes mpeshko
 notes-mpeshko.txt
-notes-mpeshko.cpp

@@ -1,4 +1,4 @@
-# version: '0.1'
+# this is a draft file
 
 services:
 
@@ -31,57 +31,56 @@ services:
       - ./backend:/app
     environment:
       DATABASE_URL: ${DATABASE_URL}
-      SECRET_KEY: ${SECRET_KEY}
-#      RAG_SERVICE_URL: http://ai_core:8001
+      RAG_SERVICE_URL: http://ai_core:8001
     depends_on:
       - db
     networks:
       - studai-net
 
   # RAG Module FastAPI (Python 3.10)
-  # ai_core:
-  #   build:
-  #     context: ./ai_core
-  #     dockerfile: Dockerfile
-  #   container_name: ai_core
-  #   restart: always
-  #   ports:
-  #     - "8001:8001"
-  #   volumes:
-  #     - ./ai_core:/app
-  #   environment:
-  #     - OPENAI_API_KEY=${OPENAI_API_KEY}
-  #   networks:
-  #     - studai-net
+  ai_core:
+    build:
+      context: ./ai_core
+      dockerfile: Dockerfile
+    container_name: ai_core
+    restart: always
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./ai_core:/app
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    networks:
+      - studai-net
 
   # Frontend React
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   container_name: frontend
-  #   restart: always
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./frontend:/app
-  #     - /app/node_modules
-  #   environment:
-  #     - REACT_APP_API_URL=http://localhost:8000
-  #   networks:
-  #     - studai-net
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    networks:
+      - studai-net
 
-  # gateway:
-  #     build: ./gateway
-  #     container_name: gateway
-  #     restart: always
-  #     ports:
-  #       - "80:80"
-  #     depends_on:
-  #       - backend
-  #       - frontend
-  #     networks:
-  #       - studai-net
+  gateway:
+      build: ./gateway
+      container_name: gateway
+      restart: always
+      ports:
+        - "80:80"
+      depends_on:
+        - backend
+        - frontend
+      networks:
+        - studai-net
 
 networks:
   studai-net:
