@@ -1,7 +1,5 @@
-# to run: uvicorn main:app --reload
-
-from fastapi import FastAPI
 from contextlib import asynccontextmanager
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware # to "allow" the frontend access
 
 # import our files
@@ -9,7 +7,8 @@ from database import create_db_and_tables
 from routes.auth import router as auth_router
 from routes.user import router as user_router
 
-# Lifespan event handler. Ensures the tables are created every time the application starts.
+# Lifespan event handler. Ensures the tables are created every 
+# time the application starts.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 	# Code here runs on startup
