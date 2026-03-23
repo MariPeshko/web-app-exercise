@@ -1,15 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
-from sqlalchemy.orm import Session
-from sqlmodel import select
+from sqlmodel import Session, select
 from typing import List
 import os
 import httpx
 
 from database import get_db
 from dependencies import get_current_user
-from models import (
-    User, Lobby, LobbyPlayer, LobbyCreate, LobbyResponse, PlayerInfo
-)
 
 # -----------------------------------------------------------------------------
 # Murat's sugestions for backend

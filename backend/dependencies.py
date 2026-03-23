@@ -1,7 +1,6 @@
 from typing import Annotated
 from fastapi import Depends, HTTPException
-from sqlalchemy.orm import Session
-from sqlmodel import select
+from sqlmodel import Session, select
 import jwt
 import os
 

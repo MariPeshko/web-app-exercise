@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from sqlmodel import select
+from sqlmodel import Session, select
 from fastapi.security import OAuth2PasswordRequestForm # to make the "Authorize" button work
 from typing import Annotated
 
@@ -54,7 +53,7 @@ async def signup(user_data: UserCreate, session: Session = Depends(get_db)):
 		(User.email == user_data.email) | (User.nickname == user_data.nickname)
 	)
 	 # sends query to database and deblocks
-	result = session.execute(query)
+	result = session.exec(query)
 	existing_user = result.first()
 
 	if existing_user:
@@ -106,7 +105,7 @@ async def login(
 	"""Handles user login and issues a JWT"""
 	# form_data has 'username' and 'password' fields
 	query = select(User).where(User.email == form_data.username)
-	result = session.execute(query)
+	result = session.exec(query)
 	user = result.scalars().first()
 
 	if not user or not verify_password(form_data.password, user.hashed_password):

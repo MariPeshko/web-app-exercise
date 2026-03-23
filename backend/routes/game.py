@@ -1,17 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from sqlmodel import select
+from sqlmodel import Session, select
 from datetime import datetime, timezone, UTC
 import os
 import httpx
 
 from database import get_db
 from dependencies import get_current_user
-from models import (
-    User, Lobby, LobbyPlayer, GameSession, GameQuestion, PlayerAnswer,
-    GameStateResponse, QuestionResponse, PlayerScoreResponse,
-    GameResultsResponse, LeaderboardEntry,
-)
 
 router = APIRouter(prefix="/game", tags=["Game"])
 
