@@ -17,15 +17,16 @@ class User(SQLModel, table=True):
     # hosted_lobbies: List["Lobby"] = Relationship(back_populates="host")
     # lobby_memberships: List["LobbyPlayer"] = Relationship(back_populates="player")
 
-class UserCreate(SQLModel):
+# Base for API schemas (no id, no hashed_password, no table=True)
+class UserBase(SQLModel):
     email: EmailStr
     nickname: str
+
+class UserCreate(UserBase):
     password: str
 
-class UserResponse(SQLModel):
+class UserResponse(UserBase):
     id: int
-    email: EmailStr
-    nickname: str
 
 class Token(SQLModel):
     access_token: str
